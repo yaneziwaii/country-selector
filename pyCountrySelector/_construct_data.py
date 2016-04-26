@@ -3,26 +3,44 @@
 dir_source = "data_src"
 dir_outcome = "data"
 
-locale_select=['en-GB','my', 'zh-Hant'] # Can be extended in the future  'zh-Hant-HK', 'zh-Hant-MO', 'zh-Hans', 'zh-Hans-SG'
-
 import os.path, glob
 import json
 import requests
 import icu # pip install PyICU
 
-## Retrive data directly from unicode-cldr project hosted at github
-
-URL_CLDR_JSON_TERRITORIES = "https://raw.githubusercontent.com/unicode-cldr/cldr-localenames-full/master/main/{locale}/territories.json"
-
-locale_json={}
-for l in locale_select:
-    url = URL_CLDR_JSON_TERRITORIES.format(locale=l)
+def url_request(url):
     r = requests.get(url)
     if r.status_code == 200:
-        locale_json [l] = r.json()['main'][l]['localeDisplayNames']['territories']
+        return r
+    else:
+        return None 
+
+# Partial Selected Construction
+locale_select=['en-GB','my', 'zh-Hant'] # Can be extended in the future  'zh-Hant-HK', 'zh-Hant-MO', 'zh-Hans', 'zh-Hans-SG'
+
+# Full Construction
+URL_CLDR_JSON_AVAIL_LOCALES = "https://raw.githubusercontent.com/unicode-cldr/cldr-core/master/availableLocales.json"
+results = url_request (url  = URL_CLDR_JSON_AVAIL_LOCALES)
+if results is not None:
+    try:
+        locale_select = results.json()['availableLocales']['full']
+    except:
+        pass
+
+## Retrive data directly from unicode-cldr project hosted at github
+print ("Retrieve data now ...")
+URL_CLDR_JSON_TERRITORIES = "https://raw.githubusercontent.com/unicode-cldr/cldr-localenames-full/master/main/{locale}/territories.json"
+locale_json={}
+for l in locale_select:
+    results = url_request (url  = URL_CLDR_JSON_TERRITORIES.format(locale=l))
+    if results is not None:
+        try:
+            locale_json [l] = results.json()['main'][l]['localeDisplayNames']['territories']
+        except:
+            pass
 
 ## Preprocessing and Generating lists
-
+print ("Preprocessing data now ...")
 ITEM_NAME_CODE = "{name}[{code}]"
 ITEM_CODE_NAME = "{code}:{name}"
 
