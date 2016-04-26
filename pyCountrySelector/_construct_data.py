@@ -52,16 +52,21 @@ for key, value in locale_json.items():
 
 
 ## Outpuing Lists
-outputfilename = "territories.json"
-for lc, outputlist in outputlist_territories.items():
+outputfn_JSON = "territories.json"
+outputfn_HTML = "territories_snippet.htm"
 
+for lc, outputlist in outputlist_territories.items():
     ### Create directory if not exists
     directory = os.path.join("..", dir_outcome, lc)
     if not os.path.exists(directory):
         os.makedirs(directory)
-
-    outputfilename = os.path.join (directory, "territories.json")
-    with open(outputfilename, 'w', encoding="utf-8") as outfile:
+    outputfn_json = os.path.join (directory, outputfn_JSON)
+    outputfn_html = os.path.join (directory, outputfn_HTML)
+    
+    with open(outputfn_json, 'w', encoding="utf-8") as outfile:
         outfile.write("{}".format(outputlist).replace("'",'"'))
         #json.dump("{}".format(outputlist), outfile)
+    with open(outputfn_html, 'w', encoding="utf-8") as outfile:
+        outputtxt = '''<datalist id="countries">'''+"".join(['''<option value="{v}">'''.format(v=x) for x in outputlist])+'''</datalist>'''
+        outfile.write(outputtxt)
 
