@@ -62,6 +62,6 @@ for lc, outputlist in outputlist_territories.items():
 
     outputfilename = os.path.join (directory, "territories.json")
     with open(outputfilename, 'w', encoding="utf-8") as outfile:
-        outfile.write("{}".format(outputlist))
+        outfile.write("{}".format(outputlist).replace("'",'"'))
         #json.dump("{}".format(outputlist), outfile)
 
